@@ -11,7 +11,8 @@ def extract_date_from_url(url):
     if match:
         return match.group(1)
     else:
-        return None
+        filename = os.path.splitext(os.path.basename(url))[0]
+        return filename
 
 def download_pdf(url):
     response = requests.get(url)

@@ -15,6 +15,12 @@ def test_extract_date_from_url():
     extracted_date = extract_date_from_url(url)
     assert extracted_date == '2023-12-01'
 
+def test_extract_name_from_url():
+    url = 'https://www.example.com/test0.pdf'
+    extracted_name = extract_date_from_url(url)
+    print(extracted_name)
+    assert extracted_name == 'test0'
+
 def test_correct_pdf():
     pdf_location = download_pdf(test_pdf_url)
     assert os.path.exists(pdf_location), f"PDF file does not exist at {pdf_location}"
@@ -71,6 +77,7 @@ def test_destroy_temp_file():
 
 def main():
     test_extract_date_from_url()
+    test_extract_name_from_url()
     test_correct_pdf()
     test_destroy_temp_file()
     test_parse_pdf_size()
