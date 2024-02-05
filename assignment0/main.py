@@ -1,14 +1,10 @@
+import argparse
 import os
 import re
 import requests
 from pypdf import PdfReader
 import sqlite3
 
-## Fetch the file and put into the tempFiles directory
-
-## Extract data from the file and put it into lists 
-
-## Create a sqlLite database
 
 def extract_date_from_url(url):
     # Assuming the date is in the format YYYY-MM-DD in the URL
@@ -64,7 +60,16 @@ def parse_pdf(filePath):
     return parent_array
 
 def createDb():
-    con = sqlite3.connect("resources/normanpd.db")
+    resources_folder = os.path.join(os.getcwd(), "resources")
+    if not os.path.exists(resources_folder):
+        os.makedirs(resources_folder)
+        print(f"Created 'resources' folder: {resources_folder}")
+
+    db_path = os.path.abspath(os.path.join("resources", "normanpd.db"))
+    if os.path.exists(db_path):
+        os.remove(db_path)
+        # print(f"Existing database file removed: {db_path}")
+    con = sqlite3.connect(db_path)
     cur = con.cursor()
     cur.execute("""
         CREATE TABLE incidents (
@@ -79,22 +84,32 @@ def createDb():
     con.close()  # Close the database connection
     
 def insertIntoDb(parse_pdf):
-    conn = sqlite3.connect("resources/normanpd.db")
+    db_path = os.path.abspath(os.path.join("resources", "normanpd.db"))
+
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
 
     for row in parse_pdf:
-        # Insert each row into the incidents table
+        
         c.execute("INSERT INTO incidents VALUES (?, ?, ?, ?, ?)", row)
 
-    conn.commit()  # Commit the changes to the database
-    conn.close()  # Close the database connection
+    conn.commit() 
+    conn.close()  
+
+def connectToDb():
+    db_path = os.path.abspath(os.path.join("resources", "normanpd.db"))
+
+    conn = sqlite3.connect(db_path)
+    return conn
+
+    
+
 
 def generate_report():
-    # Connect to the SQLite database
+
     connection = sqlite3.connect("resources/normanpd.db")
     cursor = connection.cursor()
 
-    # Execute the query to get the count of each nature of incidents
     query = """
         SELECT nature, COUNT(*) as count
         FROM incidents
@@ -103,14 +118,11 @@ def generate_report():
     """
     cursor.execute(query)
     results = cursor.fetchall()
-
-    # Generate the report
+    
     report = ""
     for row in results:
         nature, count = row
         report += f"{nature}|{count}\n"
-
-    # Close the database connection
     connection.close()
 
     return report
@@ -118,35 +130,65 @@ def generate_report():
 def destroyFile(pdf_location):
    
     temp_files_path = pdf_location
-    # print(pdf_location)
 
     if os.path.exists(temp_files_path):
         os.remove(temp_files_path)
-        # print("temp_files_path file deleted successfully.")
     else:
         print("temp_files_path file not found.")
 
 
 
-def destroyDatabase():
+def destroy_db():
 
     db_file_path = "resources/normanpd.db"
 
     if os.path.exists(db_file_path):
         os.remove(db_file_path)
-        # print("Database file deleted successfully.")
     else:
         print("Database file not found.")
 
 
 
-destination_folder = 'assignment0/tempFiles'
-pdf_url='https://www.normanok.gov/sites/default/files/documents/2023-12/2023-12-02_daily_incident_summary.pdf'
-pdf_location=download_pdf(pdf_url, destination_folder)
-parsed_data=parse_pdf(pdf_location)
-createDb()
-insertIntoDb(parsed_data)
-report=generate_report()
-print(report)
-# destroyFile(pdf_location)
-destroyDatabase()
+
+
+def getSummary(pdf_url):
+    destination_folder = 'assignment0/tempFiles'
+    # pdf_url='https://www.normanok.gov/sites/default/files/documents/2023-12/2023-12-04_daily_incident_summary.pdf'
+    try:
+        pdf_location = download_pdf(pdf_url, destination_folder)
+        if not pdf_location:
+            return
+
+        parsed_data = parse_pdf(pdf_location)
+        print("parsed_data len ", len(parsed_data))
+        if not parsed_data:
+            print("Error parsing PDF. Exiting.")
+            return
+        createDb()
+        insertIntoDb(parsed_data)
+        report = generate_report()
+        print(report)
+        destroyFile(pdf_location)
+        destroy_db()
+
+    except Exception as e:
+        print(f"An error occurred: {e}. Exiting.")
+        return
+
+def main():
+    parser = argparse.ArgumentParser(description='Generate a summary based on a PDF URL.')
+    parser.add_argument('--incidents', type=str, help='URL of the PDF containing incidents data')
+
+    args = parser.parse_args()
+
+    if not args.incidents:
+        print("Please provide the --incidents option with a PDF URL.")
+        return
+    
+    pdf_url = args.incidents
+    # pdf_url='https://www.normanok.gov/sites/default/files/documents/2023-12/2023-12-04_daily_incident_summary.pdf'
+    
+    getSummary(pdf_url)
+
+if __name__ == '__main__':
+    main()
