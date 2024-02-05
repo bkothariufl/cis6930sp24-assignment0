@@ -7,7 +7,6 @@ import sqlite3
 
 
 def extract_date_from_url(url):
-    # Assuming the date is in the format YYYY-MM-DD in the URL
     match = re.search(r'(\d{4}-\d{2}-\d{2})', url)
     if match:
         return match.group(1)
@@ -19,19 +18,13 @@ def download_pdf(url):
     if response.status_code == 200:
         date = extract_date_from_url(url)
         filename = f"{date}.pdf"
-        # destination_folder = 'assignment0/tempFiles'
         destination_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tempFiles')
-        
-        # Ensure the destination folder exists
         os.makedirs(destination_folder, exist_ok=True)
-        
-        # Construct the full file path
         dest_path = os.path.join(destination_folder, filename)
-        print(dest_path)
 
         with open(dest_path, 'wb') as pdf_file:
             pdf_file.write(response.content)
-        print(f"PDF downloaded successfully to {dest_path}")
+        # print(f"PDF downloaded successfully to {dest_path}")
         return dest_path
         
     else:
@@ -39,7 +32,6 @@ def download_pdf(url):
 
 
 def parse_pdf(filePath):
-    # Initialize a list to store extracted information
     parsed_data = []
     global pdf_data
     pdf_data=""
@@ -50,9 +42,8 @@ def parse_pdf(filePath):
         temp_data=page.extract_text(extraction_mode="layout")
         pdf_data+=temp_data+"\n"
 
-    # Split the PDF data into lines and process each line
     lines = pdf_data.split('\n')
-    parent_array = []  # Create an empty parent array
+    parent_array = [] 
     for line in lines:
         data_array = [e.strip() for e in re.split(r"\s{4,}", line.strip())]
         # print(data_array)
@@ -64,7 +55,6 @@ def parse_pdf(filePath):
     return parent_array
 
 def createDb():
-    # resources_folder = os.path.join(os.getcwd(), "resources")
     resources_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "resources")
     if not os.path.exists(resources_folder):
         os.makedirs(resources_folder)
@@ -85,8 +75,8 @@ def createDb():
             incident_ori TEXT
         )
     """)
-    con.commit()  # Commit the changes to the database
-    con.close()  # Close the database connection
+    con.commit()  
+    con.close() 
     
 def insertIntoDb(parse_pdf):
     db_path = os.path.abspath(os.path.join("resources", "normanpd.db"))
@@ -106,8 +96,6 @@ def connectToDb():
 
     conn = sqlite3.connect(db_path)
     return conn
-
-    
 
 
 def generate_report():
