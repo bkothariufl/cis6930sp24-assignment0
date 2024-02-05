@@ -14,32 +14,36 @@ def extract_date_from_url(url):
     else:
         return None
 
-def download_pdf(url, destination_folder):
+def download_pdf(url):
     response = requests.get(url)
     if response.status_code == 200:
-        date=f"{extract_date_from_url(url)}"
-        filename = date+".pdf"
+        date = extract_date_from_url(url)
+        filename = f"{date}.pdf"
+        # destination_folder = 'assignment0/tempFiles'
+        destination_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tempFiles')
+        
         # Ensure the destination folder exists
         os.makedirs(destination_folder, exist_ok=True)
         
         # Construct the full file path
         dest_path = os.path.join(destination_folder, filename)
+        print(dest_path)
 
         with open(dest_path, 'wb') as pdf_file:
             pdf_file.write(response.content)
-        # print(f"PDF downloaded successfully to {dest_path}")
+        print(f"PDF downloaded successfully to {dest_path}")
         return dest_path
-        
         
     else:
         print(f"Failed to download PDF. Status code: {response.status_code}")
+
 
 def parse_pdf(filePath):
     # Initialize a list to store extracted information
     parsed_data = []
     global pdf_data
     pdf_data=""
-    
+    filePath = os.path.abspath(filePath)
     reader = PdfReader(filePath)
     for page_num in range(len(reader.pages)):
         page = reader.pages[page_num]
@@ -60,10 +64,11 @@ def parse_pdf(filePath):
     return parent_array
 
 def createDb():
-    resources_folder = os.path.join(os.getcwd(), "resources")
+    # resources_folder = os.path.join(os.getcwd(), "resources")
+    resources_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "resources")
     if not os.path.exists(resources_folder):
         os.makedirs(resources_folder)
-        print(f"Created 'resources' folder: {resources_folder}")
+        # print(f"Created 'resources' folder: {resources_folder}")
 
     db_path = os.path.abspath(os.path.join("resources", "normanpd.db"))
     if os.path.exists(db_path):
@@ -155,7 +160,7 @@ def getSummary(pdf_url):
     destination_folder = 'assignment0/tempFiles'
     # pdf_url='https://www.normanok.gov/sites/default/files/documents/2023-12/2023-12-04_daily_incident_summary.pdf'
     try:
-        pdf_location = download_pdf(pdf_url, destination_folder)
+        pdf_location = download_pdf(pdf_url)
         if not pdf_location:
             return
 

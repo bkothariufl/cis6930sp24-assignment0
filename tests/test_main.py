@@ -9,8 +9,9 @@ import sys
 # create db
 # compare db results with own results.
 
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(project_root)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# sys.path.append(project_root)
 # print(project_root)
 
 # Now you can import modules from 'assignment0'
@@ -27,17 +28,16 @@ def test_extract_date_from_url():
     assert extracted_date == '2023-12-01'
 
 def test_correct_pdf():
-    destination_folder = 'assignment0/tempFiles'
-    pdf_location = download_pdf(test_pdf_url, destination_folder)
+    # destination_folder = 'assignment0/tempFiles'
+    pdf_location = download_pdf(test_pdf_url)
     # Check if the PDF file exists in the tempFiles folder
     assert os.path.exists(pdf_location), f"PDF file does not exist at {pdf_location}"
 
 def test_parse_pdf_size():
-    destination_folder = 'tests/testPdfs'
-
-    test_pdf_path = destination_folder+'/'+'2023-12-04.pdf'
-
-    parsed_data = parse_pdf(test_pdf_path)
+    test_pdf_path = 'testPdfs/2023-12-04.pdf'
+    test_dir = os.path.dirname(os.path.abspath(__file__))
+    full_pdf_path = os.path.join(test_dir, test_pdf_path)
+    parsed_data = parse_pdf(full_pdf_path)
 
     expected_size = 413  
 
@@ -52,12 +52,12 @@ def test_db_creation():
 
 
 def test_db_insertion():
-    destination_folder = 'tests/testPdfs'
+    # destination_folder = 'tests/testPdfs'
     # Path to a known PDF file for testing
-    test_pdf_path = destination_folder+'/'+'2023-12-04.pdf'
-
-    # Call parse_pdf function
-    parsed_data = parse_pdf(test_pdf_path)
+    test_pdf_path = 'testPdfs/2023-12-04.pdf'
+    test_dir = os.path.dirname(os.path.abspath(__file__))
+    full_pdf_path = os.path.join(test_dir, test_pdf_path)
+    parsed_data = parse_pdf(full_pdf_path)
     insertIntoDb(parsed_data)
 
 def test_db_data():
@@ -83,11 +83,10 @@ def test_destroy_db():
     assert not os.path.exists(temp_db_path), f"Database file still exists at {temp_db_path}"
 
 def test_destroy_temp_file():
-    destination_folder = 'assignment0/tempFiles'
-    temp_pdf_path = destination_folder+'/'+'2023-12-04.pdf'
+    temp_files_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../assignment0/tempFiles')
+    temp_pdf_path = os.path.join(temp_files_folder, '2023-12-04.pdf')
     destroyFile(temp_pdf_path)
     assert not os.path.exists(temp_pdf_path), f"Temp pdf file still exists at {temp_pdf_path}"
-
 
 def main():
     test_extract_date_from_url()
@@ -98,8 +97,6 @@ def main():
     test_db_insertion()
     test_db_data()
     test_destroy_db()
-    # print("all tests passed")
-    # test_destroy_temp_file()
 
 
 if __name__ == '__main__':
