@@ -92,7 +92,7 @@ def test_destroy_temp_file():
 #     # test_correct_pdf()
 #     # test_destroy_temp_file()
 #     # test_parse_pdf_size()
-#     # test_db_creation()
+    # test_db_creation()
 #     # test_db_insertion()
 #     # test_db_data()
 #     # test_destroy_db()
