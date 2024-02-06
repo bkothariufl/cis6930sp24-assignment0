@@ -63,9 +63,6 @@ The main function responsible for parsing command-line arguments, calling `getSu
 
 
 
-## Tests
-This document provides descriptions for the test functions included in the testing suite for the `assignment0` Python script.
-
 ### Test Functions
 
 #### `test_extract_date_from_url()`
