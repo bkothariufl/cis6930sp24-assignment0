@@ -154,7 +154,7 @@ def getSummary(pdf_url):
             return
 
         parsed_data = parse_pdf(pdf_location)
-        print("parsed_data len ", len(parsed_data))
+       # print("parsed_data len ", len(parsed_data))
         if not parsed_data:
             print("Error parsing PDF. Exiting.")
             return
@@ -163,7 +163,7 @@ def getSummary(pdf_url):
         report = generate_report()
         print(report)
         destroyFile(pdf_location)
-        destroy_db()
+        # destroy_db()
 
     except Exception as e:
         print(f"An error occurred: {e}. Exiting.")

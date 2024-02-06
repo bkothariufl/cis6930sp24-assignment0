@@ -5,8 +5,10 @@ name = "pypi"
 
 [packages]
 requests = "*"
+pypdf2 = "*"
+pysqlite3 = "*"
 pypdf = "*"
-sqlite3 = "*"
+pytest = "*"
 
 [dev-packages]
 
