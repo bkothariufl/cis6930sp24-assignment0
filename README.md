@@ -18,8 +18,13 @@ pipenv install --dev pytest
 pipenv install requests pysqlite3 pypdf
 
 
+
+
+
 ## How to run
 pipenv run python assignment0/main.py --incidents <url>
+https://github.com/bkothariufl/cis6930sp24-assignment0/assets/151199302/582fcf3a-65e5-4344-b181-922654639a69
+
 
 ## main.py Function Descriptions
 ### `extract_date_from_url(url: str) -> str`
