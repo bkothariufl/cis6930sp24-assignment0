@@ -64,9 +64,6 @@ The main function responsible for parsing command-line arguments, calling `getSu
 
 
 ## Tests
-
-# README - Tests
-
 This document provides descriptions for the test functions included in the testing suite for the `assignment0` Python script.
 
 ### Test Functions
