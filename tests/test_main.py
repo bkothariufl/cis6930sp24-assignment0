@@ -4,7 +4,7 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from assignment0.main import extract_date_from_url, download_pdf,createDb,parse_pdf,insertIntoDb,destroy_db,destroyFile,connectToDb
+from assignment0.main import extract_date_from_url, download_pdf,createDb,parse_pdf,insertIntoDb,destroy_db,destroyFile,connectToDb,generate_report,getSummary
 
 
 test_pdf_url='https://www.normanok.gov/sites/default/files/documents/2023-12/2023-12-04_daily_incident_summary.pdf'
@@ -18,7 +18,6 @@ def test_extract_date_from_url():
 def test_extract_name_from_url():
     url = 'https://www.example.com/test0.pdf'
     extracted_name = extract_date_from_url(url)
-    print(extracted_name)
     assert extracted_name == 'test0'
 
 def test_correct_pdf():
@@ -30,7 +29,6 @@ def test_parse_pdf_size():
     test_dir = os.path.dirname(os.path.abspath(__file__))
     full_pdf_path = os.path.join(test_dir, test_pdf_path)
     parsed_data = parse_pdf(full_pdf_path)
-
     expected_size = 413  
 
     assert len(parsed_data) == expected_size, f"Unexpected size of parent array: {len(parsed_data)}"
@@ -75,17 +73,32 @@ def test_destroy_temp_file():
     destroyFile(temp_pdf_path)
     assert not os.path.exists(temp_pdf_path), f"Temp pdf file still exists at {temp_pdf_path}"
 
-def main():
-    test_extract_date_from_url()
-    test_extract_name_from_url()
-    test_correct_pdf()
-    test_destroy_temp_file()
-    test_parse_pdf_size()
-    test_db_creation()
-    test_db_insertion()
-    test_db_data()
-    test_destroy_db()
+# def test_parsed_data():
+#     test_pdf_path = 'testPdfs/blank_nature.pdf'
+#     test_dir = os.path.dirname(os.path.abspath(__file__))
+#     full_pdf_path = os.path.join(test_dir, test_pdf_path)
+#     parsed_data = parse_pdf(full_pdf_path)
+#     # temp_db_path = os.path.join('resources', 'normanpd.db')
+#     createDb()
+#     insertIntoDb(parsed_data)
+#     report = generate_report()
+#     # print(report)
+
+# def testSummary():
+#     getSummary("https://www.normanok.gov/sites/default/files/documents/2024-01/2024-01-04_daily_incident_summary.pdf")
+# def main():
+#     # test_extract_date_from_url()
+#     # test_extract_name_from_url()
+#     # test_correct_pdf()
+#     # test_destroy_temp_file()
+#     # test_parse_pdf_size()
+#     # test_db_creation()
+#     # test_db_insertion()
+#     # test_db_data()
+#     # test_destroy_db()
+#     # test_parsed_data()
+#     # test_parsed_data()
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()

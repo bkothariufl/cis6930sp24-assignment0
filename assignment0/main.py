@@ -25,11 +25,11 @@ def download_pdf(url):
 
         with open(dest_path, 'wb') as pdf_file:
             pdf_file.write(response.content)
-        # print(f"PDF downloaded successfully to {dest_path}")
+        # print(f"PDF saved to {dest_path}")
         return dest_path
         
     else:
-        print(f"Failed to download PDF. Status code: {response.status_code}")
+        print(f"Error when trying to download PDF. Status code: {response.status_code}")
 
 
 def parse_pdf(filePath):
@@ -47,19 +47,20 @@ def parse_pdf(filePath):
     parent_array = [] 
     for line in lines:
         data_array = [e.strip() for e in re.split(r"\s{4,}", line.strip())]
-        # print(data_array)
-        if len(data_array)<5:
-            continue
-        else:
-            if data_array[0] and data_array[0][0].isdigit():
-                parent_array.append(tuple(data_array))
+        if len(data_array)>1 and data_array[0] and data_array[0][0].isdigit() :
+            if len(data_array)==3:
+                data_array.insert(2,'')
+                data_array.insert(3,'')
+            elif len(data_array)==4:
+                data_array.insert(3,'')
+            parent_array.append(tuple(data_array))
     return parent_array
 
 def createDb():
     resources_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "resources")
     if not os.path.exists(resources_folder):
         os.makedirs(resources_folder)
-        # print(f"Created 'resources' folder: {resources_folder}")
+        # print(f"Created resources folder: {resources_folder}")
 
     db_path = os.path.abspath(os.path.join("resources", "normanpd.db"))
     if os.path.exists(db_path):
@@ -86,7 +87,6 @@ def insertIntoDb(parse_pdf):
     c = conn.cursor()
 
     for row in parse_pdf:
-        
         c.execute("INSERT INTO incidents VALUES (?, ?, ?, ?, ?)", row)
 
     conn.commit() 
@@ -105,18 +105,25 @@ def generate_report():
     cursor = connection.cursor()
 
     query = """
-        SELECT nature, COUNT(*) as count
-        FROM incidents
-        GROUP BY nature
-        ORDER BY count DESC, nature
-    """
+    SELECT nature, COUNT(*) as count
+    FROM incidents
+    GROUP BY nature
+    ORDER BY 
+        CASE WHEN nature = '' THEN 1 ELSE 0 END,
+        count DESC, nature
+"""
+
     cursor.execute(query)
     results = cursor.fetchall()
     
     report = ""
     for row in results:
         nature, count = row
-        report += f"{nature}|{count}\n"
+        if nature == '':
+            report += f"|{count}\n"
+        else:
+            report += f"{nature}|{count}\n"
+        
     connection.close()
 
     return report
@@ -154,7 +161,6 @@ def getSummary(pdf_url):
             return
 
         parsed_data = parse_pdf(pdf_location)
-       # print("parsed_data len ", len(parsed_data))
         if not parsed_data:
             print("Error parsing PDF. Exiting.")
             return
@@ -170,18 +176,16 @@ def getSummary(pdf_url):
         return
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate a summary based on a PDF URL.')
+    parser = argparse.ArgumentParser(description='Generate a report based on the PDF URL.')
     parser.add_argument('--incidents', type=str, help='URL of the PDF containing incidents data')
 
     args = parser.parse_args()
 
     if not args.incidents:
-        print("Please provide the --incidents option with a PDF URL.")
+        print("Provide the --incidents option with a PDF URL.")
         return
     
     pdf_url = args.incidents
-    # pdf_url='https://www.normanok.gov/sites/default/files/documents/2023-12/2023-12-04_daily_incident_summary.pdf'
-    
     getSummary(pdf_url)
 
 if __name__ == '__main__':
