@@ -92,6 +92,9 @@ Checks if the database file is successfully deleted.
 #### `test_destroy_temp_file()`
 Verifies the deletion of a temporary PDF file.
 
+### Assumptions:
+The text extractor logic was developed assuming that no record would have multiple lines. Incase of multiple lines, it would be a limition on the scripts part. Also, assumed that at max only 2 columns would be blank, this was after going through multiple incident reports published in early 2024.
+
 ### Additional Notes
 - Some tests are commented out in the `main` function at the end of the script. They can be uncommented and run as needed. 
 
