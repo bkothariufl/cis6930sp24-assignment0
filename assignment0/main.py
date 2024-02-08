@@ -105,13 +105,11 @@ def generate_report():
     cursor = connection.cursor()
 
     query = """
-    SELECT nature, COUNT(*) as count
-    FROM incidents
-    GROUP BY nature
-    ORDER BY 
-        CASE WHEN nature = '' THEN 1 ELSE 0 END,
-        count DESC, nature
-"""
+        SELECT nature, COUNT(*) as count
+        FROM incidents
+        GROUP BY nature
+        ORDER BY count DESC, nature
+    """
 
     cursor.execute(query)
     results = cursor.fetchall()
